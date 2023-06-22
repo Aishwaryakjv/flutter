@@ -15,43 +15,6 @@ class _SignInScreenState extends State<SignInScreen> {
   TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
 
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Container(
-//         decoration: BoxDecoration(
-//           color: const Color.fromARGB(255, 39, 42, 43),
-//         ),
-//         child: Center(
-//           child: Column(
-//             children: [
-//             logoWidget("assets/images/logo.png"),
-
-//             SizedBox(
-//               height: 0,
-//             ),
-
-//             resuableTextField("Enter UserName", Icons.person_outlined, false, _emailTextController),
-
-//             SizedBox(
-//               height: 20,
-//             ),
-
-//             resuableTextField("Enter Password", Icons.lock_outline, true, _passwordTextController),
-
-//             SizedBox(
-//               height: 20,
-//             ),
-
-//             signInignUpButton(context, true, () {})
-//           ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
