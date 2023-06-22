@@ -1,0 +1,6 @@
+firebase_core: ^2.14.0
+firebase_auth: ^4.6.3
+
+compileSdkVersion 33
+minSdkVersion 21
+targetSdkVersion 33
