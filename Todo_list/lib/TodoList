@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
-class TodoList extends StatelessWidget {
+class TodoList extends StatefulWidget {
   const TodoList({super.key});
+
+  @override
+  State<TodoList> createState() => _TodoListState();
+}
+
+class _TodoListState extends State<TodoList> {
+  bool isComplet=false;
+  TextEditingController todoTitleController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -21,26 +29,49 @@ class TodoList extends StatelessWidget {
               ),
               SizedBox(height: 20),
 
-              ListView.builder(
+              ListView.separated(
+                separatorBuilder: (context, index) => Divider(color: Colors.grey[800],),
                 shrinkWrap: true,
                 itemCount: 5,
                 itemBuilder: (context, index){
-                  return ListTile(
-                    onTap: (){},
-                    leading: Container(
-                      height: 25,
-                      width: 25,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        // shape: BoxShape.circle,
+                  return Dismissible(
+                    key: Key(index.toString()),
+                    background: Container(
+                      padding: EdgeInsets.only(left: 20),
+                      alignment: Alignment.centerLeft,
+                      // alignment: Alignment.centerRight,
+                      child: Icon(Icons.delete),
+                      color: Colors.pink,
+                    ),
+                    onDismissed: (direction){
+                      print("removed");
+                    },
+                    child: ListTile(
+                      onTap: (){
+                        setState(() {
+                          isComplet = !isComplet;
+                        });
+                      },
+                      leading: Container(
+                        height: 25,
+                        width: 25,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          // shape: BoxShape.circle,
+                        ),
+                        child: isComplet
+                        ? Icon(
+                            Icons.check,
+                            color: Colors.white,
+                          )
+                        :Container(),
                       ),
-                      child: Icon(Icons.check,color: Colors.white,),
-                    ),
-                    title: Text("Todo title", style: TextStyle(
-                      color: Colors.grey[200],
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
+                      title: Text("Todo title", style: TextStyle(
+                        color: Colors.grey[200],
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      ),
                     ),
                   );
                 },
@@ -81,6 +112,7 @@ class TodoList extends StatelessWidget {
                     color: Colors.grey[400],
                   ),
                   TextFormField(
+                    controller: todoTitleController,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -106,7 +138,13 @@ class TodoList extends StatelessWidget {
                         ),
                         backgroundColor: Theme.of(context).primaryColor,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        if(todoTitleController.text.isNotEmpty)
+                        {
+                          print(todoTitleController.text);
+                          Navigator.pop(context);
+                        }
+                      },
                     ),
                   )
                 ],
