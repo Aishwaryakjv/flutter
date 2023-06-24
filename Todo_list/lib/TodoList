@@ -12,7 +12,6 @@ class TodoList extends StatefulWidget {
 
 class _TodoListState extends State<TodoList> {
   bool isComplet=false;
-  final scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController todoTitleController = TextEditingController();
 
   @override
@@ -169,18 +168,19 @@ class _TodoListState extends State<TodoList> {
                           Navigator.pop(context);
                         }
                         else{
-                          scaffoldKey.currentState?.showBottomSheet(
-                          (context){
-                         return Container(
-                            height: 1000,
-                            width: double.infinity,
-                            color: Colors.lightGreen,
-                            child: Text("Hello world"),
-                         );
-                      }
-                    );
-                          // final snackBar = SnackBar(content: const Text("hi"));
-                          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                            Future.delayed(Duration(seconds: 2), () {
+                              Navigator.of(context).pop(true);
+                            });
+                          return AlertDialog(
+                              title: Text('Enter your todo!!!', 
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              backgroundColor: Colors.pink,
+                            );
+                          });
                         }
                       },
                     ),
