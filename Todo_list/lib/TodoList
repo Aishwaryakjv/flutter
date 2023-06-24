@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:todo_list_firebase/loading.dart';
+import 'package:todo_list_firebase/model/todo.dart';
+import 'package:todo_list_firebase/service/database_service.dart';
 
 class TodoList extends StatefulWidget {
   const TodoList({super.key});
@@ -15,69 +18,86 @@ class _TodoListState extends State<TodoList> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("All ToDos",
-              style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-
-              Divider(
-                color: Colors.grey[500],
-              ),
-              SizedBox(height: 20),
-
-              ListView.separated(
-                separatorBuilder: (context, index) => Divider(color: Colors.grey[800],),
-                shrinkWrap: true,
-                itemCount: 5,
-                itemBuilder: (context, index){
-                  return Dismissible(
-                    key: Key(index.toString()),
-                    background: Container(
-                      padding: EdgeInsets.only(left: 20),
-                      alignment: Alignment.centerLeft,
-                      // alignment: Alignment.centerRight,
-                      child: Icon(Icons.delete),
-                      color: Colors.pink,
-                    ),
-                    onDismissed: (direction){
-                      print("removed");
-                    },
-                    child: ListTile(
-                      onTap: (){
-                        setState(() {
-                          isComplet = !isComplet;
-                        });
-                      },
-                      leading: Container(
-                        height: 25,
-                        width: 25,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          // shape: BoxShape.circle,
+        child: StreamBuilder<List<Todo>>(
+          stream: DatabaseService().listTodos(),
+          builder: (context, snapshot) {
+            if(!snapshot.hasData) {
+              return Loading();
+            }
+            // print(snapshot.data);
+            List<Todo>? todos = snapshot.data;
+            return Padding(
+              padding: EdgeInsets.all(25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("All ToDos",
+                  style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+        
+                  Divider(
+                    color: Colors.grey[500],
+                  ),
+                  SizedBox(height: 20),
+        
+                  ListView.separated(
+                    separatorBuilder: (context, index) => Divider(color: Colors.grey[800],),
+                    shrinkWrap: true,
+                    itemCount: todos!.length,
+                    // itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index){
+                      return Dismissible(
+                        key: Key(todos[index].title),
+                        // key: Key(index.toString()),
+                        background: Container(
+                          padding: EdgeInsets.only(left: 20),
+                          alignment: Alignment.centerLeft,
+                          // alignment: Alignment.centerRight,
+                          child: Icon(Icons.delete),
+                          color: Colors.pink,
                         ),
-                        child: isComplet
-                        ? Icon(
-                            Icons.check,
-                            color: Colors.white,
-                          )
-                        :Container(),
-                      ),
-                      title: Text("Todo title", style: TextStyle(
-                        color: Colors.grey[200],
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      ),
-                    ),
-                  );
-                },
-              )
-            ],
-          ),
+                        onDismissed: (direction) async {
+                          // print("removed");
+                          await DatabaseService().removeTodo(todos[index].uid);
+                        },
+                        child: ListTile(
+                          onTap: (){
+                            // setState(() {
+                            //   isComplet = !isComplet;
+                            // });
+                            DatabaseService().completeTask(todos[index].uid);
+                          },
+                          leading: Container(
+                            height: 25,
+                            width: 25,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              // shape: BoxShape.circle,
+                            ),
+                            child: todos[index].isComplet
+                            ? Icon(
+                                Icons.check,
+                                color: Colors.white,
+                              )
+                            :Container(),
+                          ),
+                          title: Text(
+                            todos[index].title,
+                            // "Todo title", 
+                            style: TextStyle(
+                            color: Colors.grey[200],
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                ],
+              ),
+            );
+          }
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -119,7 +139,7 @@ class _TodoListState extends State<TodoList> {
                       height: 1.5,
                     ),
                     autofocus: true,
-                    decoration: InputDecoration(hintText: "eg: coding",hintStyle: TextStyle(
+                    decoration: InputDecoration(hintText: "eg: exercise",hintStyle: TextStyle(
                       color: Colors.grey[300],
                     ),
                     border: InputBorder.none,
@@ -138,10 +158,12 @@ class _TodoListState extends State<TodoList> {
                         ),
                         backgroundColor: Theme.of(context).primaryColor,
                       ),
-                      onPressed: () {
+                      onPressed: () async{
                         if(todoTitleController.text.isNotEmpty)
                         {
-                          print(todoTitleController.text);
+                          // print(todoTitleController.text);
+                          await DatabaseService()
+                            .createNewTodo(todoTitleController.text.trim());
                           Navigator.pop(context);
                         }
                       },
