@@ -1,0 +1,115 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false, 
+      title: 'Window Shutter Control',
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+      ),
+      home: ShutterControlPage(),
+    );
+  }
+}
+
+class ShutterControlPage extends StatefulWidget {
+  @override
+  _ShutterControlPageState createState() => _ShutterControlPageState();
+}
+
+class _ShutterControlPageState extends State<ShutterControlPage> {
+  double _shutterPosition = 0.0;
+
+  void _setShutterPosition(double position) {
+    setState(() {
+      _shutterPosition = position;
+    });
+  }
+
+  void _openFully() {
+    _setShutterPosition(100.0);
+  }
+
+  void _halfOpen() {
+    _setShutterPosition(50.0);
+  }
+
+  void _closeFully() {
+    _setShutterPosition(0.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Window Shutter Control'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Image.asset('assets/window.jpg'), // Static window image
+                Positioned(
+                  bottom: _shutterPosition * 2.0, // Adjust this multiplier for positioning
+                  child: Image.asset('assets/shutter.png'), // Dynamic shutter image
+                ),
+              ],
+            ),
+            SizedBox(height: 20.0),
+            Text(
+              'Shutter Position: ${_shutterPosition.toStringAsFixed(0)}%',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            SizedBox(height: 40.0),
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+              // overlayShape: RoundSliderOverlayShape(overlayRadius: 10.0),
+              // thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+              activeTrackColor: Colors.orange,
+              inactiveTrackColor: Colors.grey,
+              ),
+            child:Container(
+              width:600,
+              child: Slider(
+                value: _shutterPosition,
+                min: 0,
+                max: 100,
+                divisions: 100,
+                label: '${_shutterPosition.round()}',
+                onChanged: (value) {
+                _setShutterPosition(value);
+                },
+              ),
+              ),
+            ),
+            SizedBox(height: 20.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: _closeFully,
+                  child: Text('Fully Close'),
+                ),
+                ElevatedButton(
+                  onPressed: _halfOpen,
+                  child: Text('Half Open'),
+                ),
+                ElevatedButton(
+                  onPressed: _openFully,
+                  child: Text('Fully Open'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
